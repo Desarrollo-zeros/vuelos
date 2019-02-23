@@ -536,10 +536,17 @@
 					string2 += '<td>'+$data[i].clases+'</td>';
 					string2 += '<td>'+$data[i].nombreAvion+'</td>';
 					string2 += '<td>'+$data[i].equipajes+'</td>';
-					var estado = ($data[i].estado == 1) ? "activo"  : "inactivo";
+
+					var estado = "";
+					if($data[i].estado == 0){
+						estado = "inactivo";
+					}else if($data[i].estado == 1){
+						estado = "esperando pago";
+					}else {
+						estado = "pagado";
+					}
 					string2 += '<td>'+estado+'</td>';
 					string2 += '</tr>';
-
 
 					var f = new Date();
 					$fecha = f.getFullYear() + "-" +  (f.getMonth() +1) + "-"+ f.getDate();

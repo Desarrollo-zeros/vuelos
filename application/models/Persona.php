@@ -93,16 +93,16 @@ class Persona extends CI_Model{
 	}
 	public function verTicketsClientes(){
 		if($this->session->rol > 1){
-			return $this->db->query("select vx.idVueloXPersona, p.cedula, p.primerNombre, p.primerApellido, 
+			return $this->db->query("select vx.estado, vx.idVueloXPersona, p.cedula, p.primerNombre, p.primerApellido, 
 									o.nombreMunicipio as origen, d.nombreMunicipio as destino, v.fechavuelo, v.valorVuelo, vx.valorTotal
 								from personas p
 								inner join vueloXpersona vx on vx.idPersona = p.idPersona
 								inner join vuelos v on v.idVuelo = vx.idVuelo
 								inner join avion a on a.idAvion = v.idAvion
 								inner join municipios o on o.idMunicipio = v.vueloOrigen
-								inner join municipios d on d.idMunicipio = v.vueloDestino where vx.estado = 1 and v.estado = 1")->result();
+								inner join municipios d on d.idMunicipio = v.vueloDestino where vx.estado = 1 or vx.estado = 2")->result();
 		}
-		 return $this->db->query("select vx.idVueloXPersona, p.cedula, p.primerNombre, p.primerApellido,p.segundoNombre, p.segundoApellido, p.telefono,
+		 return $this->db->query("select vx.estado, vx.idVueloXPersona, p.cedula, p.primerNombre, p.primerApellido,p.segundoNombre, p.segundoApellido, p.telefono,
  								o.nombreMunicipio as origen, d.nombreMunicipio as destino, v.fechavuelo, v.valorVuelo,vx.valorTotal, v.hsalidad,
  								vx.numeroAsiento, vx.clases, vx.equipajes, a.nombreAvion, vx.estado
 								from personas p
@@ -110,15 +110,18 @@ class Persona extends CI_Model{
 								inner join vuelos v on v.idVuelo = vx.idVuelo
 								inner join avion a on a.idAvion = v.idAvion
 								inner join municipios o on o.idMunicipio = v.vueloOrigen
-								inner join municipios d on d.idMunicipio = v.vueloDestino where vx.estado = 1 and v.estado = 1 and p.idUsuario  = {$this->session->idUsuario} ")->result();
+								inner join municipios d on d.idMunicipio = v.vueloDestino where vx.estado = 1 or vx.estado = 2 and v.estado = 1 and p.idUsuario  = {$this->session->idUsuario} ")->result();
 	}
 
 	public function eliminarTickeVuelo($id)
     {
         $this->db->where('idVueloXPersona', $id);
         return $this->db->update('vueloXpersona', array("estado" => 0));
-
     }
+    public function estadoTickeVuelo($id){
+		$this->db->where('idVueloXPersona', $id);
+		return $this->db->update('vueloXpersona', array("estado" => 2));
+	}
 
 	public function verAviones(){
 		return $this->db->query("select *from avion where estado = 1")->result();
@@ -153,9 +156,12 @@ class Persona extends CI_Model{
 	}
 
 	public function verPiloto(){
-		return $this->db->query("select *from piloto where estado = 1")->result();
+		return $this->db->query("select  distinct p.idPiloto, p.nombre, p.estado from piloto p  inner join vuelos v on p.idpiloto <> v.idPiloto  where p.estado = 1;")->result();
 	}
 
+	public function validarPiloto($name){
+		return ($this->db->query("select nombre from piloto where nombre = '{$name}'")->num_rows()) > 0 ? true : false;
+	}
 	public function eliminarPiloto($id){
 		$this->db->where('idPiloto', $id);
 		return $this->db->update('piloto', array("estado"=>0));

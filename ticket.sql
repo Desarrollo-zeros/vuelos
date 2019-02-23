@@ -270,3 +270,17 @@ LOCK TABLES `vuelos` WRITE;
 INSERT INTO `vuelos` VALUES (1,'2019-02-21',4,1,'14:22',30000,2,1,1,1,1),(3,'2019-02-22',2,1,'14:02',60000,10,2,2,1,1);
 /*!40000 ALTER TABLE `vuelos` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
+use ticket;
+
+select vx.idVueloXPersona, p.cedula, p.primerNombre, p.primerApellido,p.segundoNombre, p.segundoApellido, p.telefono,
+
+			 o.nombreMunicipio as origen, d.nombreMunicipio as destino, v.fechavuelo, v.valorVuelo,vx.valorTotal, v.hsalidad,
+			 vx.numeroAsiento, vx.clases, vx.equipajes, a.nombreAvion, vx.estado
+from personas p
+			 inner join vueloXpersona vx on vx.idPersona = p.idPersona
+			 inner join vuelos v on v.idVuelo = vx.idVuelo
+			 inner join avion a on a.idAvion = v.idAvion
+			 inner join municipios o on o.idMunicipio = v.vueloOrigen
+			 inner join municipios d on d.idMunicipio = v.vueloDestino where vx.estado = 1 and v.estado = 1 and p.idUsuario  = 9;

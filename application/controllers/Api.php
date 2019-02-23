@@ -160,6 +160,17 @@ class api extends CI_Controller
 		}
 	}
 
+
+	public function estadoTicketCliente(){
+		if(isset($this->session->idUsuario)){
+			echo json_encode($this->P->estadoTickeVuelo($this->input->post("idVueloXPersona")));
+		}
+		else{
+			echo json_encode(false);
+		}
+	}
+
+
 	public function verAviones(){
 		echo json_encode($this->P->verAviones());
 	}
@@ -222,7 +233,10 @@ class api extends CI_Controller
 	}
 
 	public function guardarPiloto(){
-		echo json_encode($this->P->insertar("piloto",$_POST));
+		if(!$this->P->validarPiloto($_POST["nombre"])){
+			echo json_encode($this->P->insertar("piloto",$_POST));
+		}
+		echo json_encode(false);
 	}
 
 	public function buscarVuelo(){
@@ -267,6 +281,8 @@ class api extends CI_Controller
 			}
 		}
 	}
+
+
 
 
 

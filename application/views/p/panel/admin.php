@@ -202,6 +202,7 @@
                                             <th>Fecha vuelo</th>
                                             <th>Precio Vuelo</th>
 											<th>Total a Pagar</th>
+											<th>estado</th>
 											<th>Accion</th>
                                         </tr>
                                     </thead>
@@ -383,6 +384,8 @@
 
 				<div class="col-md-12 col-xs-12 gestion" id="verGrafica" style="display: none">
 					<div class="white-box">
+						<label class="col-md-12">Reporte Cantidad de Ticketes Vs Mes</label>
+						<hr><br>
 						<div class="table-responsive">
 							<div class="ct-chart"></div>
 						</div>
@@ -593,9 +596,21 @@
 				string += '<td>'+$data[i].fechavuelo+'</td>';
 				string += '<td>'+$data[i].valorVuelo+'</td>';
 				string += '<td>'+$data[i].valorTotal+'</td>';
+
+				if($data[i].estado == 0){
+					string += '<td><span style="color:red">Eliminado</span></td>';
+					string += '<td><span><a href="#" onclick="estadoTicketPersona('+$data[i].idVueloXPersona+')" class="text-blue fa fa-save fa-fw">estado</a></span></td>';
+
+				}else if($data[i].estado == 1){
+					string += '<td><span style="color:blue">espera</span></td>';
+					string += '<td><span><a href="#" onclick="estadoTicketPersona('+$data[i].idVueloXPersona+')" class="text-blue fa fa-save fa-fw">estado</a></span></td>';
+				}else {
+					string += '<td><span style="color:green">pagado</span></td>';
+				}
 				string += '<td><span><a href="#" onclick="borrarTicketPersona('+$data[i].idVueloXPersona+')" class="text-danger fa fa-remove fa-fw">Eliminar</a></span></td>';
 				string += '</tr>';
 			}
+
 			$("#tablaVerTicket").html(string)
 
 		}
@@ -641,7 +656,7 @@
 			if(confirm("desea eliminar este Tickets")){
 				post.$url = "<?=base_url('')?>Api/eliminarTicketCliente";
 				$obj = new Object();
-				$obj.idVuelo = id;
+				$obj.idVueloXPersona = id;
 				post.$sendPost.setNpost($obj);
 				if(JSON.parse(post.$data) == true){
 					cargarVerTicker();
@@ -654,9 +669,28 @@
 		}
 
 
+
+		function estadoTicketPersona(id) {
+			if(confirm("Desea Cambiar estado ticket")){
+				post.$url = "<?=base_url('')?>Api/estadoTicketCliente";
+				$obj = new Object();
+				$obj.idVueloXPersona = id;
+				post.$sendPost.setNpost($obj);
+				if(JSON.parse(post.$data) == true){
+					cargarVerTicker();
+					alert("Ticket Actualizado");
+				}
+				else{
+					alert("ocurrio un erro al momento de eliminar");
+				}
+			}
+		}
+
+
 		$("#verAvion").click(function () {
 			$(".gestion").css("display","none");
 			$("#gestionAvion").css("display","block");
+			agregarAvion();
 		});
 
 		function verAvion() {
@@ -678,7 +712,6 @@
 		}
 
 		function  agregarAvion(){
-			$(".gestion").css("display","none");
 			$("#agregarAvion").css("display","block");
 		}
 
@@ -694,6 +727,8 @@
 				if($data == true) {
 					alert("se agrego correctamente un avion");
 					cargarVerPiloto();
+				}else{
+					alert("Piloto ya existe");
 				}
 			}
 		});
@@ -738,8 +773,6 @@
 		$("#verPrecios").click(function () {
 			$(".gestion").css("display","none");
 			$("#gestionPrecios").css("display","block");
-
-
 			post.$url = "<?=base_url('')?>Api/verPrecios";
 			post.$sendPost.setNpost();
 			$data = JSON.parse(post.$data);
@@ -794,6 +827,7 @@
 
 				string += '</tr>';
 			}
+			agregarVuelo()
 			$("#tablaVuelos").html(string);
 		}
 
@@ -802,7 +836,6 @@
 			llenarAvion();
 			$("#btnFormVuelos").removeClass("btn-info").addClass("btn-success");
 			$("#btnFormVuelos").val("Agregar Vuelos");
-			$(".gestion").css("display","none");
 			$("#agregarVuelos").css("display", "block");
 			cargarVuelo();
 		}
